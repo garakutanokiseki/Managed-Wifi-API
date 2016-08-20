@@ -38,10 +38,14 @@ namespace NativeWifi
 		/// </remarks>
 		public enum WlanIntfOpcode
 		{
-			/// <summary>
-			/// Opcode used to set or query whether auto config is enabled.
-			/// </summary>
-			AutoconfEnabled = 1,
+            /// <summary>
+            /// Not used.
+            /// </summary>
+            AutoconfStart = 0x000000000,
+            /// <summary>
+            /// Opcode used to set or query whether auto config is enabled.
+            /// </summary>
+            AutoconfEnabled = 1,
 			/// <summary>
 			/// Opcode used to set or query whether background scan is enabled.
 			/// </summary>
@@ -86,10 +90,26 @@ namespace NativeWifi
 			/// Opcode used to set or query the current operation mode of the wireless interface.
 			/// </summary>
 			CurrentOperationMode,
-			/// <summary>
-			/// Opcode used to query driver statistics.
-			/// </summary>
-			Statistics = 0x10000101,
+            /// <summary>
+            /// The opcode used to query whether the miniport/NIC combination supports Federal Information Processing Standards (FIPS) mode. This opcode can only be used in a query operation with the WlanQueryInterface function. FIPS mode is also known as safe mode. This wireless safe mode is different than the operating system safe mode. 
+            /// </summary>
+            SupportedSafeMode,
+            /// <summary>
+            /// The opcode used to query whether the miniport/NIC combination is FIPS certified. This opcode can only be used in a query operation with the WlanQueryInterface function. 
+            /// </summary>
+            CertifiedSafeMode,
+            /// <summary>
+            /// The opcode used to query for Hosted Network support in the device driver associated with the Wireless interface. This opcode can only be used in a query operation with the WlanQueryInterface function. 
+            /// </summary>
+            HostedNetworkCapable,
+            /// <summary>
+            /// The opcode used to query whether Managememt Frame Protection (MFP) is supported in the device driver associated with the Wireless interface. This opcode can only be used in a query operation with the WlanQueryInterface function. 
+            /// </summary>
+            ManagementFrameProtectionCapable,
+            /// <summary>
+            /// Opcode used to query driver statistics.
+            /// </summary>
+            Statistics = 0x10000101,
 			/// <summary>
 			/// Opcode used to query the received signal strength.
 			/// </summary>
@@ -221,13 +241,41 @@ namespace NativeWifi
 			/// <summary>
 			/// There is a profile for this network.
 			/// </summary>
-			HasProfile = 0x00000002
-		}
+			HasProfile = 0x00000002,
+            /// <summary>
+            /// The profile is the active console user's per user profile
+            /// </summary>
+            ConsoleUserProfile = 0x00000004,
+            /// <summary>
+            /// Interworking is supported
+            /// </summary>
+            InterworkingSupported = 0x00000008,
+            /// <summary>
+            /// Hotspot2 is enabled
+            /// </summary>
+            Hotspot2Enabled = 0x00000010,
+            /// <summary>
+            /// ANQP is supported
+            /// </summary>
+            ANQPSupported = 0x00000020,
+            /// <summary>
+            /// Domain network 
+            /// </summary>
+            Hotapot2Domain = 0x00000040,
+            /// <summary>
+            /// Roaming network
+            /// </summary>
+            Hotspot2Roaming = 0x00000080,
+            /// <summary>
+            /// This network failed to connect
+            /// </summary>
+            AutoConectFailed = 0x00000100,
+        }
 
-		/// <summary>
-		/// Contains information about an available wireless network.
-		/// </summary>
-		[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+        /// <summary>
+        /// Contains information about an available wireless network.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
 		public struct WlanAvailableNetwork
 		{
 			/// <summary>
@@ -455,16 +503,21 @@ namespace NativeWifi
 			NetworkAvailable,
 			Disconnecting,
 			Disconnected,
-			AdhocNetworkStateChange
-		}
+			AdhocNetworkStateChange,
+            ProfileUnblocked,
+            ScreenPowerChange,
+            ProfileBlocked,
+            ScanListRefresh,
+            OperationalStateChange,
+        }
 
-		/// <summary>
-		/// Defines the types of an MSM (<see cref="WlanNotificationSource.MSM"/>) notifications.
-		/// </summary>
-		/// <remarks>
-		/// The enumeration identifiers correspond to the native <c>wlan_notification_msm_</c> identifiers.
-		/// </remarks>
-		public enum WlanNotificationCodeMsm
+        /// <summary>
+        /// Defines the types of an MSM (<see cref="WlanNotificationSource.MSM"/>) notifications.
+        /// </summary>
+        /// <remarks>
+        /// The enumeration identifiers correspond to the native <c>wlan_notification_msm_</c> identifiers.
+        /// </remarks>
+        public enum WlanNotificationCodeMsm
 		{
 			Associating = 1,
 			Associated,
@@ -905,10 +958,13 @@ namespace NativeWifi
 			PROFILE_CHANGED_OR_DELETED = (AC_CONNECT_BASE + 12),
 			KEY_MISMATCH = (AC_CONNECT_BASE + 13),
 			USER_NOT_RESPOND = (AC_CONNECT_BASE + 14),
+            AP_PROFILE_NOT_ALLOWED_FOR_CLIENT = (AC_CONNECT_BASE + 15),
+            AP_PROFILE_NOT_ALLOWED = (AC_CONNECT_BASE + 16),
+            HOTSPOT2_PROFILE_DENIED = (AC_CONNECT_BASE + 17),
 
-			// Profile validation errors
-			//
-			INVALID_PROFILE_SCHEMA = (PROFILE_BASE + 1),
+            // Profile validation errors
+            //
+            INVALID_PROFILE_SCHEMA = (PROFILE_BASE + 1),
 			PROFILE_MISSING = (PROFILE_BASE + 2),
 			INVALID_PROFILE_NAME = (PROFILE_BASE + 3),
 			INVALID_PROFILE_TYPE = (PROFILE_BASE + 4),
@@ -1086,10 +1142,19 @@ namespace NativeWifi
 			MSMSEC_PSK_MISMATCH_SUSPECTED = (MSMSEC_CONNECT_BASE + 20),
 			// Forced failure because connection method was not secure
 			MSMSEC_FORCED_FAILURE = (MSMSEC_CONNECT_BASE + 21),
-			// ui request couldn't be queued or user pressed cancel
-			MSMSEC_SECURITY_UI_FAILURE = (MSMSEC_CONNECT_BASE + 22),
+            // Message 3 of 4 way handshake contains too many RSN IE (RSN)
+            MSMSEC_M3_TOO_MANY_RSNIE = (MSMSEC_CONNECT_BASE + 22),
+            // Message 2 of 4 way handshake has no key data (RSN Adhoc)
+            MSMSEC_M2_MISSING_KEY_DATA = (MSMSEC_CONNECT_BASE + 23),
+            // Message 2 of 4 way handshake has no IE (RSN Adhoc)
+            MSMSEC_M2_MISSING_IE = (MSMSEC_CONNECT_BASE + 24),
+            MSMSEC_AUTH_WCN_COMPLETED = (MSMSEC_CONNECT_BASE + 25),
+            // Message 3 of 4 way handshake has no Mgmt Group Key (RSN)
+            MSMSEC_M3_MISSING_MGMT_GRP_KEY = (MSMSEC_CONNECT_BASE + 26),
+            // Message 1 of group key handshake has no group mgmt key
+            MSMSEC_G1_MISSING_MGMT_GRP_KEY = (MSMSEC_CONNECT_BASE + 27),
 
-			MSMSEC_MAX = MSMSEC_END
+            MSMSEC_MAX = MSMSEC_END
 		}
 
 		/// <summary>
@@ -1233,10 +1298,18 @@ namespace NativeWifi
 			/// Specifies an extended rate PHY (ERP). 802.11g devices can use ERP.
 			/// </summary>
 			ERP = 6,
-			/// <summary>
-			/// Specifies the start of the range that is used to define PHY types that are developed by an independent hardware vendor (IHV).
-			/// </summary>
-			IHV_Start = 0x80000000,
+            /// <summary>
+            /// Specifies the 802.11n PHY type.
+            /// </summary>
+            HT = 7,
+            /// <summary>
+            /// Specifies the 802.11ac PHY type. This is the very high throughput PHY type specified in IEEE 802.11ac. (Windows 8.1, Windows Server 2012 R2, and later.)
+            /// </summary>
+            VHT = 8,
+            /// <summary>
+            /// Specifies the start of the range that is used to define PHY types that are developed by an independent hardware vendor (IHV).
+            /// </summary>
+            IHV_Start = 0x80000000,
 			/// <summary>
 			/// Specifies the end of the range that is used to define PHY types that are developed by an independent hardware vendor (IHV).
 			/// </summary>
