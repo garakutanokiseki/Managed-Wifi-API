@@ -316,23 +316,29 @@ namespace NativeWifi
 			/// </summary>
 			/// <param name="bssListPtr">A pointer to a BSS list's header.</param>
 			/// <returns>An array of BSS entries.</returns>
-			private static Wlan.WlanBssEntry[] ConvertBssListPtr(IntPtr bssListPtr)
+			private static Wlan.WlanBssEntryN[] ConvertBssListPtr(IntPtr bssListPtr)
 			{
-				Wlan.WlanBssListHeader bssListHeader = (Wlan.WlanBssListHeader)Marshal.PtrToStructure(bssListPtr, typeof(Wlan.WlanBssListHeader));
-				long bssListIt = bssListPtr.ToInt64() + Marshal.SizeOf(typeof(Wlan.WlanBssListHeader));
-				Wlan.WlanBssEntry[] bssEntries = new Wlan.WlanBssEntry[bssListHeader.numberOfItems];
-				for (int i=0; i<bssListHeader.numberOfItems; ++i)
-				{
-					bssEntries[i] = (Wlan.WlanBssEntry)Marshal.PtrToStructure(new IntPtr(bssListIt), typeof(Wlan.WlanBssEntry));
-					bssListIt += Marshal.SizeOf(typeof(Wlan.WlanBssEntry));
-				}
-				return bssEntries;
-			}
+                Wlan.WlanBssListHeader header = (Wlan.WlanBssListHeader)Marshal.PtrToStructure(bssListPtr, typeof(Wlan.WlanBssListHeader));
+                long num = bssListPtr.ToInt64() + Marshal.SizeOf(typeof(Wlan.WlanBssListHeader));
+                Wlan.WlanBssEntryN[] entryArray = new Wlan.WlanBssEntryN[header.numberOfItems];
+                for (int i = 0; i < header.numberOfItems; i++)
+                {
+                    entryArray[i] = new Wlan.WlanBssEntryN((Wlan.WlanBssEntry)Marshal.PtrToStructure(new IntPtr(num), typeof(Wlan.WlanBssEntry)));
 
-			/// <summary>
-			/// Retrieves the basic service sets (BSS) list of all available networks.
-			/// </summary>
-			public Wlan.WlanBssEntry[] GetNetworkBssList()
+                    int size = (int)entryArray[i].BaseEntry.ieSize;
+                    entryArray[i].IEs = new byte[size];
+
+                    Marshal.Copy(new IntPtr(num + entryArray[i].BaseEntry.ieOffset), entryArray[i].IEs, 0, size);
+
+                    num += Marshal.SizeOf(typeof(Wlan.WlanBssEntry));
+                }
+                return entryArray;
+            }
+
+            /// <summary>
+            /// Retrieves the basic service sets (BSS) list of all available networks.
+            /// </summary>
+            public Wlan.WlanBssEntryN[] GetNetworkBssList()
 			{
 				IntPtr bssListPtr;
 				Wlan.ThrowIfError(
@@ -353,7 +359,7 @@ namespace NativeWifi
 			/// <param name="ssid">Specifies the SSID of the network from which the BSS list is requested.</param>
 			/// <param name="bssType">Indicates the BSS type of the network.</param>
 			/// <param name="securityEnabled">Indicates whether security is enabled on the network.</param>
-			public Wlan.WlanBssEntry[] GetNetworkBssList(Wlan.Dot11Ssid ssid, Wlan.Dot11BssType bssType, bool securityEnabled)
+			public Wlan.WlanBssEntryN[] GetNetworkBssList(Wlan.Dot11Ssid ssid, Wlan.Dot11BssType bssType, bool securityEnabled)
 			{
 				IntPtr ssidPtr = Marshal.AllocHGlobal(Marshal.SizeOf(ssid));
 				Marshal.StructureToPtr(ssid, ssidPtr, false);

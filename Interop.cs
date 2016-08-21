@@ -809,10 +809,24 @@ namespace NativeWifi
 			public uint ieSize;
 		}
 
-		/// <summary>
-		/// Contains the set of supported data rates.
-		/// </summary>
-		[StructLayout(LayoutKind.Sequential)]
+        /// <summary>
+        /// Extend information element
+        /// </summary>
+        public class WlanBssEntryN
+        {
+            public WlanBssEntry BaseEntry;
+            public byte[] IEs;
+
+            public WlanBssEntryN(WlanBssEntry bssEntry)
+            {
+                BaseEntry = bssEntry;
+            }
+        }
+
+        /// <summary>
+        /// Contains the set of supported data rates.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
 		public struct WlanRateSet
 		{
 			/// <summary>
