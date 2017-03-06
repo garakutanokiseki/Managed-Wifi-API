@@ -383,11 +383,31 @@ namespace NativeWifi
 				}
 			}
 
-			/// <summary>
-			/// Connects to a network defined by a connection parameters structure.
-			/// </summary>
-			/// <param name="connectionParams">The connection paramters.</param>
-			protected void Connect(Wlan.WlanConnectionParameters connectionParams)
+
+            public Wlan.WlanInterfaceCapability GetInterfaceCapability()
+            {
+                IntPtr capabilityPtr;
+                Wlan.ThrowIfError(
+                    Wlan.WlanGetInterfaceCapability(client.clientHandle, info.interfaceGuid, IntPtr.Zero, out capabilityPtr));
+                try
+                {
+                    //Wlan.WlanInterfaceCapability capability = new Wlan.WlanInterfaceCapability();
+
+                    Wlan.WlanInterfaceCapability capability = (Wlan.WlanInterfaceCapability)Marshal.PtrToStructure(capabilityPtr, typeof(Wlan.WlanInterfaceCapability));
+
+                    return capability;
+                }
+                finally
+                {
+                    Wlan.WlanFreeMemory(capabilityPtr);
+                }
+            }
+
+            /// <summary>
+            /// Connects to a network defined by a connection parameters structure.
+            /// </summary>
+            /// <param name="connectionParams">The connection paramters.</param>
+            protected void Connect(Wlan.WlanConnectionParameters connectionParams)
 			{
 				Wlan.ThrowIfError(
 					Wlan.WlanConnect(client.clientHandle, info.interfaceGuid, ref connectionParams, IntPtr.Zero));

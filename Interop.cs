@@ -732,7 +732,43 @@ namespace NativeWifi
 			[Out] out IntPtr wlanBssList
 		);
 
-		[StructLayout(LayoutKind.Sequential)]
+        [DllImport("wlanapi.dll")]
+        public static extern int WlanGetInterfaceCapability(
+            [In] IntPtr clientHandle,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid interfaceGuid,
+            [In] IntPtr dot11SsidInt,
+            [Out] out IntPtr interfaceCapability
+        );
+
+        public enum WlanInterfaceType
+        {
+            //Specifies an emulated 802.11 interface. 
+            wlan_interface_type_emulated_802_11 = 0,
+            //Specifies a native 802.11 interface. 
+            wlan_interface_type_native_802_11,
+            //The interface specified is invalid.
+            wlan_interface_type_invalid
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WlanInterfaceCapability
+        {
+            //A WLAN_INTERFACE_TYPE value that indicates the type of the interface.
+            public WlanInterfaceType wlanInterfaceType;
+            //Indicates whether 802.11d is supported by the interface. If TRUE, 802.11d is supported.
+            public bool bDot11DSupported;
+            //The maximum size of the SSID list supported by this interface.
+            public uint dwMaxDesiredSsidListSize;
+            //The maximum size of the basic service set (BSS) identifier list supported by this interface.
+            public uint dwMaxDesiredBssidListSize;
+            //Contains the number of supported PHY types.
+            public uint dwNumberOfSupportedPhys;
+            //An array of DOT11_PHY_TYPE values that specify the supported PHY types. WLAN_MAX_PHY_INDEX is set to 64.
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+            public Dot11PhyType[] dot11PhyTypes;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
 		internal struct WlanBssListHeader
 		{
 			internal uint totalSize;
