@@ -884,8 +884,8 @@ namespace NativeWifi
 			{
 				get
 				{
-					ushort[] rates = new ushort[rateSetLength / sizeof(ushort)];
-					Array.Copy(rateSet, rates, rates.Length);
+                    ushort[] rates = new ushort[rateSetLength];
+                    Array.Copy(rateSet, rates, rates.Length);
 					return rates;
 				}
 			}
