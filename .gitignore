@@ -1,0 +1,16 @@
+
+obj/Debug/ManagedWifi.csproj.FileListAbsolute.txt
+obj/Debug/ManagedWifi.csprojResolveAssemblyReference.cache
+obj/Debug/ManagedWifi.dll
+obj/Debug/ManagedWifi.pdb
+bin/Debug/ManagedWifi.dll
+bin/Debug/ManagedWifi.pdb
+WifiExample/bin/Debug/ManagedWifi.dll
+WifiExample/bin/Debug/ManagedWifi.pdb
+WifiExample/bin/Debug/WifiExample.exe
+WifiExample/bin/Debug/WifiExample.exe.config
+WifiExample/bin/Debug/WifiExample.pdb
+WifiExample/obj/Debug/WifiExample.csproj.FileListAbsolute.txt
+WifiExample/obj/Debug/WifiExample.csprojResolveAssemblyReference.cache
+WifiExample/obj/Debug/WifiExample.exe
+WifiExample/obj/Debug/WifiExample.pdb
