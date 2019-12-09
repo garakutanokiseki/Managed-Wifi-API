@@ -7,3 +7,8 @@ The library uses the  [Native Wifi API](http://msdn2.microsoft.com/en-us/library
 You can find sample code in the WifiExample directory.  
 
 This code was developed as part of our work at Monfort Software Engineering.  
+
+## Release 1.2.0 (f.hintsch)
+
+* Update to .NET Framework 4.6.1
+* Error corrected: After WLAN disconnect the DLL crashed due to ArgumentException

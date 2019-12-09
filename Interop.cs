@@ -261,7 +261,7 @@ namespace NativeWifi
             /// <summary>
             /// Domain network 
             /// </summary>
-            Hotapot2Domain = 0x00000040,
+            Hotspot2Domain = 0x00000040,
             /// <summary>
             /// Roaming network
             /// </summary>
@@ -269,7 +269,7 @@ namespace NativeWifi
             /// <summary>
             /// This network failed to connect
             /// </summary>
-            AutoConectFailed = 0x00000100,
+            AutoConnectFailed = 0x00000100,
         }
 
         /// <summary>
